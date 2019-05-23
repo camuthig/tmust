@@ -1,23 +1,20 @@
 extern crate clap;
 extern crate dirs;
 extern crate handlebars;
-extern crate run_script;
 extern crate serde;
 extern crate serde_json;
 extern crate serde_yaml;
 use clap::{App, SubCommand, ArgMatches, Arg};
 use handlebars::Handlebars;
-use run_script::ScriptOptions;
 use serde_json::json;
-use serde::{Serialize, Deserialize};
-use std::env;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
-use std::process::Command;
-use std::process::ExitStatus;
+
+mod tmux;
+use tmux::Config;
 
 fn main() {
     let matches = App::new("tmust")
@@ -43,23 +40,6 @@ fn main() {
         ("start", Some(matches)) => start(matches),
         _ => println!("No subcommand"),
     }
-}
-
-fn tmux(config: Config) -> i32 {
-    let mut reg = Handlebars::new();
-
-    let template_str = fs::read_to_string("start.sh.hbs").unwrap();
-    let script = reg.render_template(&template_str, &json!(config)).unwrap();
-
-    println!("{:?}", script);
-
-    let mut options = ScriptOptions::new();
-    options.capture_output = false;
-    let args = vec![];
-
-    let (code, _, _) = run_script::run(&script, &args, &options).unwrap();
-
-    code
 }
 
 fn config_path() -> PathBuf {
@@ -94,19 +74,6 @@ fn config_file(project: &str) -> File {
     f
 }
 
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Config {
-    #[serde(default = "get_shell")]
-    shell: String,
-    name: String,
-    root: String,
-}
-
-fn get_shell() -> String {
-    env::var("SHELL").unwrap()
-}
-
 fn get_config(project: &str) -> Config {
     let config_file = config_file(project);
 
@@ -129,7 +96,7 @@ fn new(matches: &ArgMatches) {
         return;
     }
 
-    let mut reg = Handlebars::new();
+    let reg = Handlebars::new();
 
     let template_str = fs::read_to_string("project.yaml.hbs").expect("Unable to read template file");
     let config_content = reg.render_template(&template_str, &json!({"project": project})).expect("Unable to render template");
@@ -140,13 +107,9 @@ fn new(matches: &ArgMatches) {
 }
 
 fn start(matches: &ArgMatches) {
-    // TODO Find the configuration file from the configuration directory
     let project = matches.value_of("project").unwrap();
     let config = get_config(project);
 
-    // TODO parse configuration file
-
-    // TODO start session using configuration values
     println!("Starting {}...", project);
-    tmux(config);
+    tmux::run(config);
 }
