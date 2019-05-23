@@ -1,0 +1,8 @@
+#! {{shell}}
+
+tmux start-server;
+
+cd {{root}}
+
+# TODO Handle the session already existing
+tmux new-session -s {{name}}
