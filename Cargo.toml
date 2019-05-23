@@ -5,3 +5,8 @@ authors = ["Chris Muthig <camuthig@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+clap = "^2"
+dirs = "^1"
+handlebars = "^1"
+serde = "^1"
+serde_json = "^1"
