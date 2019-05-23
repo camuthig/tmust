@@ -111,5 +111,11 @@ fn start(matches: &ArgMatches) {
     let config = get_config(project);
 
     println!("Starting {}...", project);
-    tmux::run(config);
+
+    if tmux::has_session(project.to_string()) {
+        println!("attaching existing session");
+        tmux::attach(project.to_string());
+    } else {
+        tmux::run(config);
+    }
 }
