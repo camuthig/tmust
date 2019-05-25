@@ -9,7 +9,6 @@ use run_script::ScriptOptions;
 use serde::{Serialize, Deserialize};
 use serde_json::json;
 use std::env;
-use std::fs;
 use std::process::Command;
 
 fn get_shell() -> String {
@@ -44,7 +43,7 @@ pub struct Window {
 pub fn start(config: Config) -> i32 {
     let reg = Handlebars::new();
 
-    let template_str = fs::read_to_string("start.sh.hbs").unwrap();
+    let template_str = include_str!("start.sh.hbs");
     let script = reg.render_template(&template_str, &json!(config)).unwrap();
 
     for w in config.windows {
@@ -56,7 +55,6 @@ pub fn start(config: Config) -> i32 {
 
     let mut options = ScriptOptions::new();
     options.capture_output = false;
-    options.print_commands = true;
     let args = vec![];
 
     let (code, _, _) = run_script::run(&script, &args, &options).unwrap();

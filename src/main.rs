@@ -16,6 +16,7 @@ use std::path::PathBuf;
 mod tmux;
 use tmux::Config;
 
+
 fn main() {
     let matches = App::new("tmust")
         .version("0.1")
@@ -98,8 +99,9 @@ fn new(matches: &ArgMatches) {
 
     let reg = Handlebars::new();
 
-    let template_str = fs::read_to_string("project.yaml.hbs").expect("Unable to read template file");
-    let config_content = reg.render_template(&template_str, &json!({"project": project})).expect("Unable to render template");
+    let project_template = include_str!("project.yaml.hbs");
+
+    let config_content = reg.render_template(&project_template, &json!({"project": project})).expect("Unable to render template");
 
     let mut f = File::create(config_path.as_path()).expect("Unable to create new project file");
 
@@ -116,6 +118,7 @@ fn start(matches: &ArgMatches) {
         let status = tmux::start(config);
 
         if status != 0 {
+            // TODO Clean up this handling
             panic!("Unable to start the session");
         }
     }
