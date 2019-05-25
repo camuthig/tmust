@@ -15,10 +15,6 @@ tmux new-session -d -s {{name}}
     tmux new-window -t {{@root.name}}:{{@index}} -n {{name}} -c {{@root.root}}
     {{/if}}
 
-    {{#if @root.pre_window}}
-        tmux send-keys -t {{@root.name}}:{{@../index}} '{{{@root.pre_window}}}' C-m
-    {{/if}}
-
     # Run each of the configured commands for the window
     {{#each commands}}
         tmux send-keys -t {{@root.name}}:{{@../index}} '{{{this}}}' C-m
