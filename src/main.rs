@@ -4,7 +4,7 @@ extern crate handlebars;
 extern crate serde;
 extern crate serde_json;
 extern crate serde_yaml;
-use clap::{App, SubCommand, ArgMatches, Arg};
+use clap::{App, AppSettings, SubCommand, ArgMatches, Arg};
 use handlebars::Handlebars;
 use serde_json::json;
 use std::fs;
@@ -19,6 +19,7 @@ use tmux::Config;
 
 fn main() {
     let matches = App::new("tmust")
+        .setting(AppSettings::SubcommandRequiredElseHelp)
         .version("0.1")
         .about("Automate your tmux envionrments")
         .author("Chris Muthig")
