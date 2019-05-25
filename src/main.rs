@@ -44,7 +44,7 @@ fn main() {
 }
 
 fn config_path() -> PathBuf {
-    let mut config_dir = dirs::home_dir().expect("Unable to determine home directory");
+    let mut config_dir = dirs::home_dir().unwrap();
 
     config_dir.push(Path::new(".tmust"));
 

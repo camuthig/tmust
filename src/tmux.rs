@@ -46,15 +46,9 @@ pub fn start(config: Config) -> i32 {
     let template_str = include_str!("start.sh.hbs");
     let script = reg.render_template(&template_str, &json!(config)).unwrap();
 
-    for w in config.windows {
-        for c in w.commands {
-            println!("{:?}", c);
-        }
-    }
-    println!("{:?}", script);
-
     let mut options = ScriptOptions::new();
     options.capture_output = false;
+
     let args = vec![];
 
     let (code, _, _) = run_script::run(&script, &args, &options).unwrap();
