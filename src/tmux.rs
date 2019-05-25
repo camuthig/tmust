@@ -22,16 +22,41 @@ pub struct Config {
     shell: String,
     name: String,
     root: String,
+    #[serde(default = "Vec::new")]
+    windows: Vec<Window>,
 }
 
-pub fn run(config: Config) -> i32 {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Window {
+    name: String,
+    #[serde(default = "Vec::new")]
+    commands: Vec<String>,
+}
+
+// TODO bring back in pane control
+//#[derive(Serialize, Deserialize, Debug)]
+//pub struct Pane {
+//    name: String,
+//    #[serde(default = "Vec::new")]
+//    commands: Vec<String>,
+//}
+
+pub fn start(config: Config) -> i32 {
     let reg = Handlebars::new();
 
     let template_str = fs::read_to_string("start.sh.hbs").unwrap();
     let script = reg.render_template(&template_str, &json!(config)).unwrap();
 
+    for w in config.windows {
+        for c in w.commands {
+            println!("{:?}", c);
+        }
+    }
+    println!("{:?}", script);
+
     let mut options = ScriptOptions::new();
     options.capture_output = false;
+    options.print_commands = true;
     let args = vec![];
 
     let (code, _, _) = run_script::run(&script, &args, &options).unwrap();

@@ -112,10 +112,13 @@ fn start(matches: &ArgMatches) {
 
     println!("Starting {}...", project);
 
-    if tmux::has_session(project.to_string()) {
-        println!("attaching existing session");
-        tmux::attach(project.to_string());
-    } else {
-        tmux::run(config);
+    if !tmux::has_session(project.to_string()) {
+        let status = tmux::start(config);
+
+        if status != 0 {
+            panic!("Unable to start the session");
+        }
     }
+
+    tmux::attach(project.to_string());
 }
