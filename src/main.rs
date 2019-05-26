@@ -137,7 +137,7 @@ fn list(matches: &ArgMatches) {
     let des: ReadDir = fs::read_dir(config_dir_path).unwrap();
 
     for de in des {
-        let de = de.expect("Well that's odd");
+        let de = de.unwrap();
         //println!("{:?}", de.path());
 
         if de.file_name().into_string().unwrap().ends_with(".yaml") {
