@@ -19,7 +19,7 @@ fn get_shell() -> String {
 pub struct Config {
     #[serde(default = "get_shell")]
     shell: String,
-    name: String,
+    pub name: String,
     root: String,
     pre_window: Option<String>,
     #[serde(default = "Vec::new")]

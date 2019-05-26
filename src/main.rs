@@ -8,7 +8,7 @@ use clap::{App, AppSettings, SubCommand, ArgMatches, Arg};
 use handlebars::Handlebars;
 use serde_json::json;
 use std::fs;
-use std::fs::File;
+use std::fs::{File, ReadDir};
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
@@ -35,11 +35,14 @@ fn main() {
                          .help("The name of the new tmux project")
                          .index(1)
                          .required(true)))
+        .subcommand(SubCommand::with_name("list")
+                    .about("List the configured projects"))
         .get_matches();
 
     match matches.subcommand() {
         ("new", Some(matches)) => new(matches),
         ("start", Some(matches)) => start(matches),
+        ("list", Some(matches)) => list(matches),
         _ => println!("No subcommand"),
     }
 }
@@ -125,4 +128,24 @@ fn start(matches: &ArgMatches) {
     }
 
     tmux::attach(project.to_string());
+}
+
+fn list(matches: &ArgMatches) {
+    println!("Projects:\n");
+    let config_dir_path = config_path();
+
+    let des: ReadDir = fs::read_dir(config_dir_path).unwrap();
+
+    for de in des {
+        let de = de.expect("Well that's odd");
+        //println!("{:?}", de.path());
+
+        if de.file_name().into_string().unwrap().ends_with(".yaml") {
+            let f = File::open(de.path()).expect("Unable to read configuration file");
+            let c: Config = serde_yaml::from_reader(f).expect("Unable to parse config file");
+            println!("{}", c.name);
+        }
+    }
+
+
 }
