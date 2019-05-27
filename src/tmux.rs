@@ -57,7 +57,7 @@ pub fn start(config: Config) -> i32 {
     code
 }
 
-pub fn attach(project: String) -> i32 {
+pub fn attach(project: &String) -> i32 {
     let status = Command::new("tmux")
         .args(&["attach", "-t", &project])
         .status()
@@ -66,7 +66,7 @@ pub fn attach(project: String) -> i32 {
     status.code().unwrap_or(1)
 }
 
-pub fn has_session(project: String) -> bool {
+pub fn has_session(project: &String) -> bool {
     let output = Command::new("tmux")
         .arg("list-sessions")
         .output()

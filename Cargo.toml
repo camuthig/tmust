@@ -5,6 +5,8 @@ authors = ["Chris Muthig <camuthig@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+quicli = "^0.4"
+structopt = "^0.2"
 clap = "^2"
 dirs = "^1"
 handlebars = "^1"
