@@ -186,7 +186,6 @@ fn start(cmd: &Start) -> Result<(), Error> {
 }
 
 fn list() -> Result<(), Error> {
-    println!("Projects:\n");
     let config_dir_path = config_path();
 
     let des: ReadDir = fs::read_dir(config_dir_path)?;
