@@ -144,6 +144,8 @@ fn new(cmd: &New) -> Result<(), Error> {
 
     f.write(config_content.as_bytes()).expect("Unable to write configuration template");
 
+    edit(&Edit { project: cmd.project.to_owned() })?;
+
     Ok(())
 }
 
