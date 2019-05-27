@@ -51,6 +51,12 @@ struct Edit {
     project: String,
 }
 
+#[derive(Debug, StructOpt)]
+struct Delete {
+    #[structopt(index = 1, help = "The name of the tmux project")]
+    project: String,
+}
+
 
 #[derive(Debug, StructOpt)]
 enum Command {
@@ -62,6 +68,9 @@ enum Command {
 
     #[structopt(name = "start", about = "Start a new tmux session")]
     Start(Start),
+
+    #[structopt(name = "delete", about = "Delete an existing tmux project")]
+    Delete(Delete),
 
     #[structopt(name = "list", about = "List the configured projects")]
     List {
@@ -75,6 +84,7 @@ fn main() -> CliResult {
         Command::New(c)=> new(&c)?,
         Command::Edit(c) => edit(&c)?,
         Command::Start(c) => start(&c)?,
+        Command::Delete(c) => delete(&c)?,
         Command::List{..} => list()?,
     }
 
@@ -183,6 +193,23 @@ fn start(cmd: &Start) -> Result<(), Error> {
     }
 
     tmux::attach(&cmd.project);
+
+    Ok(())
+}
+
+fn delete(cmd: &Delete) -> Result<(), Error> {
+    let mut config_path = config_path();
+
+    config_path.push(cmd.project.to_owned() + ".yaml");
+
+    if !config_path.as_path().exists() {
+        println!("The {} project does not yet exist.", cmd.project);
+        return Ok(());
+    }
+
+    fs::remove_file(config_path.as_path())?;
+
+    println!("Deleted {} project", cmd.project);
 
     Ok(())
 }
