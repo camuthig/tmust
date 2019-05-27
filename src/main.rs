@@ -8,11 +8,13 @@ extern crate serde_yaml;
 use handlebars::Handlebars;
 use quicli::prelude::*;
 use serde_json::json;
+use std::env;
 use std::fs;
 use std::fs::{File, ReadDir};
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
+use std::process::Command as StdCommand;
 use structopt::StructOpt;
 
 mod tmux;
@@ -43,11 +45,20 @@ struct Start {
     project: String,
 }
 
+#[derive(Debug, StructOpt)]
+struct Edit {
+    #[structopt(index = 1, help = "The name of the tmux project")]
+    project: String,
+}
+
 
 #[derive(Debug, StructOpt)]
 enum Command {
     #[structopt(name = "new", about = "Add a new tmux project")]
     New(New),
+
+    #[structopt(name = "edit", about = "Edit an existing tmux project")]
+    Edit(Edit),
 
     #[structopt(name = "start", about = "Start a new tmux session")]
     Start(Start),
@@ -62,6 +73,7 @@ fn main() -> CliResult {
 
     match &tmust.cmd {
         Command::New(c)=> new(&c)?,
+        Command::Edit(c) => edit(&c)?,
         Command::Start(c) => start(&c)?,
         Command::List{..} => list()?,
     }
@@ -131,6 +143,25 @@ fn new(cmd: &New) -> Result<(), Error> {
     let mut f = File::create(config_path.as_path()).expect("Unable to create new project file");
 
     f.write(config_content.as_bytes()).expect("Unable to write configuration template");
+
+    Ok(())
+}
+
+fn edit(cmd: &Edit) -> Result<(), Error> {
+    let mut config_path = config_path();
+
+    config_path.push(cmd.project.to_owned() + ".yaml");
+
+    if !config_path.as_path().exists() {
+        println!("The {} project does not yet exist.", cmd.project);
+        return Ok(());
+    }
+
+    let editor = env::var("EDITOR")?;
+
+    StdCommand::new(editor)
+        .args(&[config_path.as_path()])
+        .status()?;
 
     Ok(())
 }
