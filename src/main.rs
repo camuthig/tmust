@@ -57,6 +57,13 @@ struct Delete {
     project: String,
 }
 
+#[derive(Debug, StructOpt)]
+struct Rename {
+    #[structopt(index = 1, help = "The existing project to rename")]
+    existing: String,
+    #[structopt(index = 2, help = "The new name for the project")]
+    new: String,
+}
 
 #[derive(Debug, StructOpt)]
 enum Command {
@@ -72,6 +79,9 @@ enum Command {
     #[structopt(name = "delete", about = "Delete an existing tmux project")]
     Delete(Delete),
 
+    #[structopt(name = "rename", about = "Rename an existing tmux project")]
+    Rename(Rename),
+
     #[structopt(name = "list", about = "List the configured projects")]
     List {
     },
@@ -85,6 +95,7 @@ fn main() -> CliResult {
         Command::Edit(c) => edit(&c)?,
         Command::Start(c) => start(&c)?,
         Command::Delete(c) => delete(&c)?,
+        Command::Rename(c) => rename(&c)?,
         Command::List{..} => list()?,
     }
 
@@ -210,6 +221,32 @@ fn delete(cmd: &Delete) -> Result<(), Error> {
     fs::remove_file(config_path.as_path())?;
 
     println!("Deleted {} project", cmd.project);
+
+    Ok(())
+}
+
+fn rename(cmd: &Rename) -> Result<(), Error> {
+    let mut config = get_config(&cmd.existing);
+    config.name = cmd.new.to_owned();
+
+    let mut existing_path = config_path();
+
+    existing_path.push(cmd.existing.to_owned() + ".yaml");
+
+    let mut new_path = config_path();
+
+    new_path.push(cmd.new.to_owned() + ".yaml");
+
+    if new_path.as_path().exists() {
+        println!("The {} project already exists.", cmd.new);
+        return Ok(());
+    }
+
+    let new_content = serde_yaml::to_string(&config)?;
+
+    fs::remove_file(existing_path.as_path())?;
+
+    fs::write(new_path.as_path(), new_content)?;
 
     Ok(())
 }
