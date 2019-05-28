@@ -21,6 +21,7 @@ pub struct Config {
     shell: String,
     pub name: String,
     root: String,
+    startup_window: Option<String>,
     pre_window: Option<String>,
     #[serde(default = "Vec::new")]
     windows: Vec<Window>,

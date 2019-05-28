@@ -25,3 +25,6 @@ tmux new-session -d -s {{name}}
     {{/each}}
 {{/each}}
 
+{{#if startup_window}}
+    tmux select-window -t {{name}}:{{startup_window}}
+{{/if}}
