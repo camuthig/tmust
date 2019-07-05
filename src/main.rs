@@ -1,5 +1,6 @@
 extern crate clap;
 extern crate dirs;
+#[macro_use]
 extern crate handlebars;
 extern crate serde;
 extern crate serde_json;
@@ -46,6 +47,12 @@ struct Start {
 }
 
 #[derive(Debug, StructOpt)]
+struct Stop {
+    #[structopt(index = 1, help = "The name of the tmux project")]
+    project: String,
+}
+
+#[derive(Debug, StructOpt)]
 struct Edit {
     #[structopt(index = 1, help = "The name of the tmux project")]
     project: String,
@@ -76,6 +83,9 @@ enum Command {
     #[structopt(name = "start", about = "Start a new tmux session")]
     Start(Start),
 
+    #[structopt(name = "stop", about = "Stop a running tmux session")]
+    Stop(Stop),
+
     #[structopt(name = "delete", about = "Delete an existing tmux project")]
     Delete(Delete),
 
@@ -94,6 +104,7 @@ fn main() -> CliResult {
         Command::New(c)=> new(&c)?,
         Command::Edit(c) => edit(&c)?,
         Command::Start(c) => start(&c)?,
+        Command::Stop(c) => stop(&c)?,
         Command::Delete(c) => delete(&c)?,
         Command::Rename(c) => rename(&c)?,
         Command::List{..} => list()?,
@@ -194,16 +205,27 @@ fn start(cmd: &Start) -> Result<(), Error> {
 
     println!("Starting {}...", cmd.project);
 
-    if !tmux::has_session(&cmd.project) {
-        let status = tmux::start(config);
+	let status = tmux::start(config);
 
-        if status != 0 {
-            // TODO Clean up this handling
-            error!("Unable to start the session");
-        }
+	if status != 0 {
+		// TODO Clean up this handling
+		error!("Unable to start the session");
+	}
+
+    Ok(())
+}
+
+fn stop(cmd: &Stop) -> Result<(), Error> {
+    let config = get_config(&cmd.project);
+
+    println!("Stopping {}...", cmd.project);
+
+    let status = tmux::stop(config);
+
+    if status != 0 {
+        // TODO Clean up this handling
+        error!("Unable to stop the session");
     }
-
-    tmux::attach(&cmd.project);
 
     Ok(())
 }
