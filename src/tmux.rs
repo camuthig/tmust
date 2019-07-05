@@ -22,6 +22,11 @@ pub struct Config {
     pub name: String,
     root: String,
     startup_window: Option<String>,
+    on_project_start: Option<String>,
+    on_project_first_start: Option<String>,
+    on_project_exit: Option<String>,
+    on_project_stop: Option<String>,
+    on_project_restart: Option<String>,
     pre_window: Option<String>,
     #[serde(default = "Vec::new")]
     windows: Vec<Window>,
@@ -43,7 +48,7 @@ pub struct Window {
 //}
 
 pub fn start(config: Config) -> i32 {
-    let reg = Handlebars::new();
+    let reg = handlebars_registry();
 
     let template_str = include_str!("start.sh.hbs");
     let script = reg.render_template(&template_str, &json!(config)).unwrap();
@@ -58,13 +63,20 @@ pub fn start(config: Config) -> i32 {
     code
 }
 
-pub fn attach(project: &String) -> i32 {
-    let status = Command::new("tmux")
-        .args(&["attach", "-t", &project])
-        .status()
-        .unwrap();
+pub fn stop(config: Config) -> i32 {
+    let reg = handlebars_registry();
 
-    status.code().unwrap_or(1)
+    let template_str = include_str!("stop.sh.hbs");
+    let script = reg.render_template(&template_str, &json!(config)).unwrap();
+
+    let mut options = ScriptOptions::new();
+    options.capture_output = false;
+
+    let args = vec![];
+
+    let (code, _, _) = run_script::run(&script, &args, &options).unwrap();
+
+    code
 }
 
 pub fn has_session(project: &String) -> bool {
@@ -77,3 +89,13 @@ pub fn has_session(project: &String) -> bool {
 
     r.is_match(&String::from_utf8(output.stdout).unwrap())
 }
+
+pub fn handlebars_registry() -> Handlebars {
+    let mut h = Handlebars::new();
+
+    h.register_helper("has_session", Box::new(has_session_helper));
+
+    return h;
+}
+
+handlebars_helper!(has_session_helper: |name: str| has_session(&name.to_string()));
