@@ -1,6 +1,6 @@
 #! {{shell}}
 
-tmux start-server;
+{{{tmux_command}}} start-server;
 
 cd {{root}}
 
@@ -13,29 +13,29 @@ cd {{root}}
 		{{{on_project_first_start}}}
 	{{/if}}
 
-	tmux new-session -d -s {{name}}
+    {{{tmux_command}}} new-session -d -s {{name}}
 
 	# TODO Support a non-root start location
 	# Setup the windows
 	{{#each windows}}
 		{{#if @first}}
-			tmux rename-window -t {{@root.name}}:0 {{name}}
+            {{{tmux_command}}} rename-window -t {{@root.name}}:0 {{name}}
 		{{else}}
-			tmux new-window -t {{@root.name}}:{{@index}} -n {{name}} -c {{@root.root}}
+            {{{tmux_command}}} new-window -t {{@root.name}}:{{@index}} -n {{name}} -c {{@root.root}}
 		{{/if}}
 
 		{{#if @root.pre_window}}
-			tmux send-keys -t {{@root.name}}:{{@../index}} '{{{@root.pre_window}}}' C-m
+            {{{tmux_command}}} send-keys -t {{@root.name}}:{{@../index}} '{{{@root.pre_window}}}' C-m
 		{{/if}}
 
 		# Run each of the configured commands for the window
 		{{#each commands}}
-			tmux send-keys -t {{@root.name}}:{{@../index}} '{{{this}}}' C-m
+            {{{tmux_command}}} send-keys -t {{@root.name}}:{{@../index}} '{{{this}}}' C-m
 		{{/each}}
 	{{/each}}
 
 	{{#if startup_window}}
-		tmux select-window -t {{name}}:{{startup_window}}
+        {{{tmux_command}}} select-window -t {{name}}:{{startup_window}}
 	{{/if}}
 {{else}}
 
@@ -45,7 +45,7 @@ cd {{root}}
 
 {{/if}}
 
-tmux -u attach-session -t {{name}}
+{{{tmux_command}}} -u attach-session -t {{name}}
 
 {{#if on_project_exit}}
 	{{{on_project_exit}}}

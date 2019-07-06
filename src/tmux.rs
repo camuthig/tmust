@@ -15,6 +15,10 @@ fn get_shell() -> String {
     env::var("SHELL").unwrap()
 }
 
+fn get_tmux() -> String {
+    String::from_str("tmux")
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     #[serde(default = "get_shell")]
@@ -28,6 +32,8 @@ pub struct Config {
     on_project_stop: Option<String>,
     on_project_restart: Option<String>,
     pre_window: Option<String>,
+    #[serde(default = "get_tmux")]
+    tmux_command: String,
     #[serde(default = "Vec::new")]
     windows: Vec<Window>,
 }
@@ -80,6 +86,7 @@ pub fn stop(config: Config) -> i32 {
 }
 
 pub fn has_session(project: &String) -> bool {
+    // TODO Handle the custom command here...
     let output = Command::new("tmux")
         .arg("list-sessions")
         .output()
