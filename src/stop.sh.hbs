@@ -1,6 +1,6 @@
 #! {{shell}}
 
-{{#if (has_session name)}}
+{{#if (session_exists tmux_command name)}}
     # TODO Include default if root is not set?
     cd {{root}}
 
