@@ -8,7 +8,7 @@ cd {{root}}
 	{{{on_project_start}}}
 {{/if}}
 
-{{#if (not(has_session nam))}}
+{{#if (not(has_session name))}}
 	{{#if on_project_first_start}}
 		{{{on_project_first_start}}}
 	{{/if}}
@@ -40,7 +40,7 @@ cd {{root}}
 {{else}}
 
 	{{#if on_project_restart}}
-		{{{on_project_restart}}
+		{{{on_project_restart}}}
 	{{/if}}
 
 {{/if}}
