@@ -14,7 +14,7 @@ cd {{root}}
 	{{/if}}
 
     # Create the session and the first window
-    {{{tmux_command}}} new-session -d -s {{name}} -n {{windows.1.name}}
+    {{{tmux_command}}} new-session -d -s {{name}} -n {{windows.0.name}}
 
 	# TODO Support a non-root start location
 	# Setup the windows
