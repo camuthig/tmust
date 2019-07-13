@@ -13,29 +13,29 @@ cd {{root}}
 		{{{on_project_first_start}}}
 	{{/if}}
 
-    {{{tmux_command}}} new-session -d -s {{name}}
+    # Create the session and the first window
+    {{{tmux_command}}} new-session -d -s {{name}} -n {{windows.1.name}}
 
 	# TODO Support a non-root start location
 	# Setup the windows
 	{{#each windows}}
 		{{#if @first}}
-            {{{tmux_command}}} rename-window -t {{@root.name}}:0 {{name}}
 		{{else}}
-            {{{tmux_command}}} new-window -t {{@root.name}}:{{@index}} -n {{name}} -c {{@root.root}}
+            {{{@root.tmux_command}}} new-window -t {{@root.name}}:{{@index}} -n {{name}} -c {{@root.root}}
 		{{/if}}
 
 		{{#if @root.pre_window}}
-            {{{tmux_command}}} send-keys -t {{@root.name}}:{{@../index}} '{{{@root.pre_window}}}' C-m
+            {{{@root.tmux_command}}} send-keys -t {{@root.name}}:{{@../index}} '{{{@root.pre_window}}}' C-m
 		{{/if}}
 
 		# Run each of the configured commands for the window
 		{{#each commands}}
-            {{{tmux_command}}} send-keys -t {{@root.name}}:{{@../index}} '{{{this}}}' C-m
+            {{{@root.tmux_command}}} send-keys -t {{@root.name}}:{{@../index}} '{{{this}}}' C-m
 		{{/each}}
 	{{/each}}
 
 	{{#if startup_window}}
-        {{{tmux_command}}} select-window -t {{name}}:{{startup_window}}
+        {{{@root.tmux_command}}} select-window -t {{name}}:{{startup_window}}
 	{{/if}}
 {{else}}
 
