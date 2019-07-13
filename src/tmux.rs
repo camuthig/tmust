@@ -35,6 +35,7 @@ pub struct Config {
     pre_window: Option<String>,
     #[serde(default = "get_tmux")]
     tmux_command: String,
+    tmux_options: Option<String>,
     #[serde(default = "Vec::new")]
     windows: Vec<Window>,
 }
