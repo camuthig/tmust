@@ -9,5 +9,5 @@
 	  {{{hook_on_project_stop}}}
  	{{/if}}
 
-    {{{tmux_command}}} kill-session -t {{name}}
+    {{{tmux_command}}} {{{tmux_options}}} kill-session -t {{name}}
 {{/if}}
