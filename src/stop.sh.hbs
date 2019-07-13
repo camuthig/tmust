@@ -1,6 +1,6 @@
 #! {{shell}}
 
-{{#if (has_session name)}}
+{{#if (session_exists tmux_command name)}}
     # TODO Include default if root is not set?
     cd {{root}}
 
@@ -9,6 +9,5 @@
 	  {{{hook_on_project_stop}}}
  	{{/if}}
 
-	# TODO Support custom tmux executable
-	tmux kill-session -t {{name}}
+    {{{tmux_command}}} kill-session -t {{name}}
 {{/if}}

@@ -19,7 +19,7 @@ use std::process::Command as StdCommand;
 use structopt::StructOpt;
 
 mod tmux;
-use tmux::Config;
+use tmux::{Config, Project};
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -93,8 +93,7 @@ enum Command {
     Rename(Rename),
 
     #[structopt(name = "list", about = "List the configured projects")]
-    List {
-    },
+    List { },
 }
 
 fn main() -> CliResult {
@@ -201,11 +200,11 @@ fn edit(cmd: &Edit) -> Result<(), Error> {
 }
 
 fn start(cmd: &Start) -> Result<(), Error> {
-    let config = get_config(&cmd.project);
+    let project = Project::new(get_config(&cmd.project));
 
     println!("Starting {}...", cmd.project);
 
-	let status = tmux::start(config);
+    let status = project.start();
 
 	if status != 0 {
 		// TODO Clean up this handling
@@ -216,11 +215,11 @@ fn start(cmd: &Start) -> Result<(), Error> {
 }
 
 fn stop(cmd: &Stop) -> Result<(), Error> {
-    let config = get_config(&cmd.project);
+    let project = Project::new(get_config(&cmd.project));
 
     println!("Stopping {}...", cmd.project);
 
-    let status = tmux::stop(config);
+    let status = project.stop();
 
     if status != 0 {
         // TODO Clean up this handling
