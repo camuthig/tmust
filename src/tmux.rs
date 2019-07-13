@@ -6,7 +6,7 @@ extern crate serde;
 use handlebars::Handlebars;
 use regex::Regex;
 use run_script::ScriptOptions;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::env;
 use std::process::Command;
@@ -60,15 +60,17 @@ pub struct Project {
 }
 
 impl Project {
-	pub fn new(config: Config) -> Project {
-		Project { config }
-	}
+    pub fn new(config: Config) -> Project {
+        Project { config }
+    }
 
     pub fn start(&self) -> i32 {
         let reg = handlebars_registry();
 
         let template_str = include_str!("start.sh.hbs");
-        let script = reg.render_template(&template_str, &json!(self.config)).unwrap();
+        let script = reg
+            .render_template(&template_str, &json!(self.config))
+            .unwrap();
 
         let mut options = ScriptOptions::new();
         options.capture_output = false;
@@ -84,7 +86,9 @@ impl Project {
         let reg = handlebars_registry();
 
         let template_str = include_str!("stop.sh.hbs");
-        let script = reg.render_template(&template_str, &json!(self.config)).unwrap();
+        let script = reg
+            .render_template(&template_str, &json!(self.config))
+            .unwrap();
 
         let mut options = ScriptOptions::new();
         options.capture_output = false;
@@ -95,27 +99,25 @@ impl Project {
 
         code
     }
-
 }
 
 fn session_exists(tmux_command: &String, name: &String) -> bool {
-	let output = Command::new(tmux_command)
-		.arg("list-sessions")
-		.output()
-		.unwrap();
+    let output = Command::new(tmux_command)
+        .arg("list-sessions")
+        .output()
+        .unwrap();
 
-	let r = Regex::new(&format!("^{}:", name).to_string()).unwrap();
+    let r = Regex::new(&format!("^{}:", name).to_string()).unwrap();
 
-	r.is_match(&String::from_utf8(output.stdout).unwrap())
+    r.is_match(&String::from_utf8(output.stdout).unwrap())
 }
 
-
 fn handlebars_registry() -> Handlebars {
-	let mut h = Handlebars::new();
+    let mut h = Handlebars::new();
 
-	h.register_helper("session_exists", Box::new(session_exists_helper));
+    h.register_helper("session_exists", Box::new(session_exists_helper));
 
-	return h;
+    return h;
 }
 
 handlebars_helper!(session_exists_helper: |tc: str, n: str| session_exists(&tc.to_string(), &n.to_string()));

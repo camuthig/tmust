@@ -93,20 +93,20 @@ enum Command {
     Rename(Rename),
 
     #[structopt(name = "list", about = "List the configured projects")]
-    List { },
+    List {},
 }
 
 fn main() -> CliResult {
     let tmust = Tmust::from_args();
 
     match &tmust.cmd {
-        Command::New(c)=> new(&c)?,
+        Command::New(c) => new(&c)?,
         Command::Edit(c) => edit(&c)?,
         Command::Start(c) => start(&c)?,
         Command::Stop(c) => stop(&c)?,
         Command::Delete(c) => delete(&c)?,
         Command::Rename(c) => rename(&c)?,
-        Command::List{..} => list()?,
+        Command::List { .. } => list()?,
     }
 
     Ok(())
@@ -152,7 +152,6 @@ fn get_config(project: &String) -> Config {
     config
 }
 
-
 fn new(cmd: &New) -> Result<(), Error> {
     let mut config_path = config_path();
 
@@ -169,13 +168,17 @@ fn new(cmd: &New) -> Result<(), Error> {
 
     let project_template = include_str!("project.yaml.hbs");
 
-    let config_content = reg.render_template(&project_template, &json!({"project": cmd.project}))?;
+    let config_content =
+        reg.render_template(&project_template, &json!({"project": cmd.project}))?;
 
     let mut f = File::create(config_path.as_path()).expect("Unable to create new project file");
 
-    f.write(config_content.as_bytes()).expect("Unable to write configuration template");
+    f.write(config_content.as_bytes())
+        .expect("Unable to write configuration template");
 
-    edit(&Edit { project: cmd.project.to_owned() })?;
+    edit(&Edit {
+        project: cmd.project.to_owned(),
+    })?;
 
     Ok(())
 }
@@ -206,10 +209,10 @@ fn start(cmd: &Start) -> Result<(), Error> {
 
     let status = project.start();
 
-	if status != 0 {
-		// TODO Clean up this handling
-		error!("Unable to start the session");
-	}
+    if status != 0 {
+        // TODO Clean up this handling
+        error!("Unable to start the session");
+    }
 
     Ok(())
 }
